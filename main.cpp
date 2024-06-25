@@ -6,14 +6,6 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-unsigned int VBO;
-unsigned int VAO;
-
-float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-};
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -31,9 +23,6 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0);\n"
 "}\0";
 
-unsigned int fragmentShader;
-
-unsigned int shaderProgram;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -76,7 +65,7 @@ int main() {
      int success;
      char infoLog[512];
 
-     vertexShader = glCreateShader(GL_VERTEX_SHADER);
+     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
      glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
      glCompileShader(vertexShader);
@@ -89,7 +78,7 @@ int main() {
 
 
      // Fragment Shader *************************************************************************************
-     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
      glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
      glCompileShader(fragmentShader);
@@ -101,7 +90,7 @@ int main() {
          std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
      }
      // Shader Program *************************************************************************************
-     shaderProgram = glCreateProgram();
+     unsigned int shaderProgram = glCreateProgram();
 
      glAttachShader(shaderProgram, vertexShader);
      glAttachShader(shaderProgram, fragmentShader);
@@ -115,12 +104,22 @@ int main() {
 
      glDeleteShader(vertexShader);
      glDeleteShader(fragmentShader);
+     //********************************************************************************************************
 
+
+     float vertices[] = {
+         -0.5f, -0.5f, 0.0f,
+          0.5f, -0.5f, 0.0f,
+          0.0f,  0.5f, 0.0f
+     };
+
+     unsigned int VBO, VAO;
      glGenBuffers(1, &VBO); // create the buffer
-     glGenVertexArrays(1, &VAO);
-     glBindVertexArray(VAO); // bind VAO
+     glGenVertexArrays(1, &VAO); // create array buffer
 
+     glBindVertexArray(VAO); // bind VAO
      glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
+   
      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
 
 
