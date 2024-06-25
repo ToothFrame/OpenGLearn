@@ -7,6 +7,8 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 unsigned int VBO;
+unsigned int VAO;
+
 float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
@@ -70,13 +72,7 @@ int main() {
         return -1;
      }
 
-     glGenBuffers(1, &VBO); // create the buffer
-
-     glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
-
-     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
-
-// Vertex Shader *************************************************************************************
+     // Vertex Shader *************************************************************************************
      int success;
      char infoLog[512];
 
@@ -92,7 +88,7 @@ int main() {
      }
 
 
-// Fragment Shader *************************************************************************************
+     // Fragment Shader *************************************************************************************
      fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
      glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -104,7 +100,7 @@ int main() {
          glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
          std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
      }
-// Shader Program *************************************************************************************
+     // Shader Program *************************************************************************************
      shaderProgram = glCreateProgram();
 
      glAttachShader(shaderProgram, vertexShader);
@@ -120,6 +116,24 @@ int main() {
      glDeleteShader(vertexShader);
      glDeleteShader(fragmentShader);
 
+     glGenBuffers(1, &VBO); // create the buffer
+     glGenVertexArrays(1, &VAO);
+     glBindVertexArray(VAO); // bind VAO
+
+     glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
+     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
+
+
+     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // specifies data format for vertices
+     glEnableVertexAttribArray(0); // vertex attributes are disabled by default
+
+     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+     glBindVertexArray(0);
+    
+
+
     while (!glfwWindowShouldClose(window))
     {
         //input
@@ -128,6 +142,10 @@ int main() {
         // rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO); // why this twice?
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // check events and swap buffers
         glfwSwapBuffers(window);
