@@ -14,8 +14,6 @@ const char* vertexShaderSource = "#version 330 core\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
 
-unsigned int vertexShader;
-
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
@@ -107,20 +105,28 @@ int main() {
      //********************************************************************************************************
 
 
-     float vertices[] = {
-         -0.5f, -0.5f, 0.0f,
-          0.5f, -0.5f, 0.0f,
-          0.0f,  0.5f, 0.0f
+     float vertices[] = { // rectangle
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
+     };
+     unsigned int indices[] = {  // first add all the vertices, then connect them by indices so they are not drawn multiple times
+         0, 1, 3,   // first triangle
+         1, 2, 3    // second triangle
      };
 
-     unsigned int VBO, VAO;
+     unsigned int VBO, VAO, EBO;
      glGenBuffers(1, &VBO); // create the buffer
      glGenVertexArrays(1, &VAO); // create array buffer
+     glGenBuffers(1, &EBO); // creating element buffer object to avoid vertex overlap issues
 
      glBindVertexArray(VAO); // bind VAO
      glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
-   
+     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // bind EBO. DO NOT UNBIND WHILE VAO IS ACTIVE AS EBO IS STORED WITHIN IT
+
      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
+     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 
      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // specifies data format for vertices
@@ -128,9 +134,9 @@ int main() {
 
      glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
      glBindVertexArray(0);
-    
+
+     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
 
 
     while (!glfwWindowShouldClose(window))
@@ -143,9 +149,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // why this twice?
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        glBindVertexArray(VAO); // redundant since we only have one VAO
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0); // "good practice"
         // check events and swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
