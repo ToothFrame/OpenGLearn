@@ -9,18 +9,21 @@ const unsigned int SCR_HEIGHT = 600;
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec3 aColor;"
+"out vec3 ourColor;\n"
 "void main()\n"
 "{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"   gl_Position = vec4(aPos, 1.0);\n"
+"ourColor = aColor;\n"
 "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"in vec3 ourColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0);\n"
+"   FragColor = vec4(ourColor, 1.0f);\n"
 "}\0";
-
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -87,6 +90,7 @@ int main() {
          glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
          std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
      }
+
      // Shader Program *************************************************************************************
      unsigned int shaderProgram = glCreateProgram();
 
@@ -104,39 +108,35 @@ int main() {
      glDeleteShader(fragmentShader);
      //********************************************************************************************************
 
-
      float vertices[] = { // rectangle
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
-     };
-     unsigned int indices[] = {  // first add all the vertices, then connect them by indices so they are not drawn multiple times
-         0, 1, 3,   // first triangle
-         1, 2, 3    // second triangle
+     0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+   // -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f // top left 
      };
 
-     unsigned int VBO, VAO, EBO;
-     glGenBuffers(1, &VBO); // create the buffer
+     unsigned int VBO, VAO;
+
      glGenVertexArrays(1, &VAO); // create array buffer
-     glGenBuffers(1, &EBO); // creating element buffer object to avoid vertex overlap issues
+     glGenBuffers(1, &VBO); // create the buffer
 
      glBindVertexArray(VAO); // bind VAO
+     
      glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
-     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // bind EBO. DO NOT UNBIND WHILE VAO IS ACTIVE AS EBO IS STORED WITHIN IT
-
      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
-     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-
-     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // specifies data format for vertices
+     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // specifies data format for vertices
      glEnableVertexAttribArray(0); // vertex attributes are disabled by default
+
+     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+     glEnableVertexAttribArray(1);
+
 
      glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-     glBindVertexArray(0);
+     glUseProgram(shaderProgram);
 
-     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
 
 
     while (!glfwWindowShouldClose(window))
@@ -148,10 +148,11 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // redundant since we only have one VAO
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0); // "good practice"
+
+        //draw
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         // check events and swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
