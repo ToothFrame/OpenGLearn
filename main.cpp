@@ -3,33 +3,13 @@
 
 #include <iostream>
 #include "Shader.h"
-
+#include "stb_image.h"
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-
-const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec3 aColor;"
-"out vec3 ourColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos, 1.0);\n"
-"ourColor = aColor;\n"
-"}\0";
-
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec3 ourColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(ourColor, 1.0f);\n"
-"}\0";
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-
 
 
 int main() {
@@ -65,14 +45,13 @@ int main() {
      }
 
      // shader 
-     Shader ourShader("fragmentShader.glsl", "vertexShader.glsl");
+     Shader ourShader("vertexShader.glsl", "fragmentShader.glsl");
      //**************************************************************
 
      float vertices[] = { // rectangle
-     0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, // bottom left
-   // -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f // top left 
+     0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.5f, 0.0f, // top 
+     0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,// bottom right
+    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f// bottom left
      };
 
      unsigned int VBO, VAO;
@@ -85,18 +64,59 @@ int main() {
      glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind buffer (i believe any configuration will be applied to the last bound buffer)
      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // copy vertices into the buffer's memory
 
-     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // specifies data format for vertices
+     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); // specifies data format for vertices
      glEnableVertexAttribArray(0); // vertex attributes are disabled by default
 
-     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); // colour
      glEnableVertexAttribArray(1);
+
+     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); // texture
+     glEnableVertexAttribArray(2);
 
 
      glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
      ourShader.use();
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
+     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
+
+     //TEXTURES *************************************************************
+
+
+     float textCoords[] = {
+         0.0f, 0.0f,
+         1.0f, 0.0f,
+         0.5f, 1.0f
+     };
+
+     unsigned int texture;
+
+     glGenTextures(1, &texture);
+     glBindTexture(GL_TEXTURE_2D, texture);
+
+     // set the texture wrapping/filtering options (on the currently bound texture object)
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+     int width, height, nrChannels;
+     unsigned char* data = stbi_load("Resources/Assets/container.jpg", &width, &height, &nrChannels, 0);
+
+     if (data)
+     {
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+         glGenerateMipmap(GL_TEXTURE_2D);
+     }
+     else
+     {
+         std::cout << "Failed to load texture" << std::endl;
+     }
+     stbi_image_free(data);
+
+
+
 
 
     while (!glfwWindowShouldClose(window))
@@ -108,7 +128,7 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        ourShader.setFloat("someUniform", 1.0f);
+        ourShader.setFloat("time", glfwGetTime());
 
         //draw
         glBindVertexArray(VAO);

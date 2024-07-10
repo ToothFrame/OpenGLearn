@@ -24,14 +24,51 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\includes\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\includes\glad\glad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\includes\GLFW\glfw3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\includes\GLFW\glfw3native.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\includes\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fragmentShader.glsl" />
     <None Include="vertexShader.glsl" />
+    <None Include="x64\Debug\OpenGL.exe" />
+    <None Include="x64\Debug\OpenGL.exe.recipe" />
+    <None Include="x64\Debug\OpenGL.ilk" />
+    <None Include="x64\Debug\OpenGL.pdb" />
+    <None Include="x64\Debug\vc143.idb" />
+    <None Include="x64\Debug\vc143.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Resources\lib\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="x64\Debug\glad.obj" />
+    <Object Include="x64\Debug\main.obj" />
+    <Object Include="x64\Debug\Shader.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="x64\Debug\OpenGL.Build.CppClean.log" />
+    <Text Include="x64\Debug\OpenGL.log" />
+    <Text Include="x64\Debug\OpenGL.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
 </Project>
