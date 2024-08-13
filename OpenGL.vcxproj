@@ -75,8 +75,9 @@
     <LibraryPath>F:\Uni stuff\OpenGL\Resources\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>F:\Uni stuff\OpenGL\Resources\includes;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\Uni stuff\OpenGL\Resources\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\Resources\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\Resources\lib;$(LibraryPath)</LibraryPath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -113,6 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Resources\includes\glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,25 +155,6 @@
   <ItemGroup>
     <None Include="fragmentShader.glsl" />
     <None Include="vertexShader.glsl" />
-    <None Include="x64\Debug\OpenGL.exe" />
-    <None Include="x64\Debug\OpenGL.exe.recipe" />
-    <None Include="x64\Debug\OpenGL.ilk" />
-    <None Include="x64\Debug\OpenGL.pdb" />
-    <None Include="x64\Debug\vc143.idb" />
-    <None Include="x64\Debug\vc143.pdb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="Resources\lib\glfw3.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="x64\Debug\glad.obj" />
-    <Object Include="x64\Debug\main.obj" />
-    <Object Include="x64\Debug\Shader.obj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="x64\Debug\OpenGL.Build.CppClean.log" />
-    <Text Include="x64\Debug\OpenGL.log" />
-    <Text Include="x64\Debug\OpenGL.vcxproj.FileListAbsolute.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

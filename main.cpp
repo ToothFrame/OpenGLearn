@@ -4,6 +4,8 @@
 #include <iostream>
 #include "Shader.h"
 #include "stb_image.h"
+#include <glm/glm.hpp>
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
