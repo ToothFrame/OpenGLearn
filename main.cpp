@@ -13,10 +13,12 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 float translationSpeed = 0.001f;
+float rotationSpeed = 0.001f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void cameraControl(GLFWwindow* window, glm::vec3 &translationVector);
+void modelControl(GLFWwindow* window, glm::vec3& rotationVector);
 
 
 int main() {
@@ -163,6 +165,7 @@ int main() {
      glm::vec3 translationVector;
 
      //transformations
+     glm::vec3 rotationVector;
 
      unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
      
@@ -182,9 +185,16 @@ int main() {
         processInput(window);
 
         //camera stuff
-        translationVector = glm::vec3(0.0f);
+        
         cameraControl(window, translationVector);
         view = glm::translate(view, translationVector);
+
+        // model movement
+        
+        modelControl(window, rotationVector);
+        model = glm::rotate(model, rotationVector.x, glm::vec3(1.0f, 0.0f, 0.0f));  // X-axis rotation
+        model = glm::rotate(model, rotationVector.y, glm::vec3(0.0f, 1.0f, 0.0f));  // Y-axis rotation
+        model = glm::rotate(model, rotationVector.z, glm::vec3(0.0f, 0.0f, 1.0f));  // Z-axis rotation
 
         //model view proj matrixes update
         int modelLoc = glGetUniformLocation(ourShader.ID, "model");
@@ -229,6 +239,9 @@ void processInput(GLFWwindow* window) {
 }
 
 void cameraControl(GLFWwindow* window, glm::vec3& translationVector) {
+
+    translationVector = glm::vec3(0.0f);
+
     // Translation along the Z-axis
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         translationVector.z += translationSpeed;
@@ -251,5 +264,34 @@ void cameraControl(GLFWwindow* window, glm::vec3& translationVector) {
     }
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
         translationVector.y += translationSpeed;
+    }
+}
+
+void modelControl(GLFWwindow* window, glm::vec3& rotationVector) {
+
+    rotationVector = glm::vec3(0.0f);
+
+    // rotation along the Z-axis
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        rotationVector.x -= rotationSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        rotationVector.x += rotationSpeed;
+    }
+
+    // rotation along the X-axis
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        rotationVector.y -= rotationSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        rotationVector.y += rotationSpeed;
+    }
+
+    // rotation along the Y-axis
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
+        rotationVector.z -= rotationSpeed;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
+        rotationVector.z += rotationSpeed;
     }
 }
