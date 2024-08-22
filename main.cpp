@@ -12,8 +12,8 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-float translationSpeed = 0.001f;
-float rotationSpeed = 0.001f;
+float translationSpeed = 0.005f;
+float rotationSpeed = 0.02f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -58,11 +58,52 @@ int main() {
      //**************************************************************
 
      float vertices[] = {
-         // positions          // colors           // texture coords (note that we changed them to 'zoom in' on our texture image)
-          0.5f,  0.5f, 0.0f,    1.0f, 1.0f, // top right
-          0.5f, -0.5f, 0.0f,    1.0f, 0.0f, // bottom right
-         -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, // bottom left
-         -0.5f,  0.5f, 0.0f,    0.0f, 1.0f  // top left 
+         //// positions          // colors           // texture coords (note that we changed them to 'zoom in' on our texture image)
+         // 0.5f,  0.5f, 0.0f,    1.0f, 1.0f, // top right
+         // 0.5f, -0.5f, 0.0f,    1.0f, 0.0f, // bottom right
+         //-0.5f, -0.5f, 0.0f,    0.0f, 0.0f, // bottom left
+         //-0.5f,  0.5f, 0.0f,    0.0f, 1.0f  // top left 
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
      };
      unsigned int indices[] = {
          0, 1, 3, // first triangle
@@ -97,6 +138,9 @@ int main() {
      glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
      ourShader.setInt("texture2", 1);
      // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe mode
+
+     //depth buffer enable
+     glEnable(GL_DEPTH_TEST);
 
      //TEXTURES *************************************************************
 
@@ -213,9 +257,12 @@ int main() {
 
         ourShader.setFloat("time", glfwGetTime());
 
-        //draw
+        //depthBuffer clear
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        //draw.
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // check events and swap buffers
         glfwSwapBuffers(window);
