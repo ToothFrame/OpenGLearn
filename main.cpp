@@ -12,12 +12,18 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-float translationSpeed = 0.005f;
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
 float rotationSpeed = 0.02f;
+const float cameraSpeed = 0.05f;
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-void cameraControl(GLFWwindow* window, glm::vec3 &translationVector);
 void modelControl(GLFWwindow* window, glm::vec3& rotationVector);
 
 
@@ -123,6 +129,8 @@ int main() {
         glm::vec3(-1.3f,  1.0f, -1.5f)
      };
 
+
+
      unsigned int VBO, VAO, EBO;
 
      glGenVertexArrays(1, &VAO); // create array buffer
@@ -217,17 +225,17 @@ int main() {
          std::cout << "Failed to load texture" << std::endl;
      }
      stbi_image_free(data);
-
-     //camera movement
-     glm::vec3 translationVector;
      
+     
+     //matrices
      glm::mat4 model = glm::mat4(1.0f);
      model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
      glm::mat4 view = glm::mat4(1.0f);
-     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
+     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
      glm::mat4 projection;
+     projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.001f, 1000.0f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -236,17 +244,11 @@ int main() {
         processInput(window);
 
         //camera stuff
-        
-        cameraControl(window, translationVector);
-        view = glm::translate(view, translationVector);
-        projection = glm::perspective(glm::radians(75.0f), 800.0f / 600.0f, 0.001f, 1000.0f);
-
+        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
         //model view proj matrixes update
         ourShader.setMat4("model", model);
-
         ourShader.setMat4("view", view);
-
         ourShader.setMat4("projection", projection);
 
 
@@ -275,6 +277,7 @@ int main() {
         // check events and swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
+       
     }
     glfwTerminate();
 	return 0;
@@ -290,37 +293,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraPos += cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraPos -= cameraSpeed * cameraFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
-void cameraControl(GLFWwindow* window, glm::vec3& translationVector) {
-
-    translationVector = glm::vec3(0.0f);
-
-    // Translation along the Z-axis
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        translationVector.z += translationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        translationVector.z -= translationSpeed;
-    }
-
-    // Translation along the X-axis
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        translationVector.x += translationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        translationVector.x -= translationSpeed;
-    }
-
-    // Translation along the Y-axis
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        translationVector.y -= translationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS) {
-        translationVector.y += translationSpeed;
-    }
-}
 
 void modelControl(GLFWwindow* window, glm::vec3& rotationVector) {
 
