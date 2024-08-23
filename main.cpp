@@ -16,8 +16,6 @@ const unsigned int SCR_HEIGHT = 600;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-float rotationSpeed = 0.02f;
-
 //camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -26,7 +24,6 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-void modelControl(GLFWwindow* window, glm::vec3& rotationVector);
 
 
 int main() {
@@ -303,32 +300,3 @@ void processInput(GLFWwindow* window) {
         cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
-
-void modelControl(GLFWwindow* window, glm::vec3& rotationVector) {
-
-    rotationVector = glm::vec3(0.0f);
-
-    // rotation along the Z-axis
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-        rotationVector.x -= rotationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-        rotationVector.x += rotationSpeed;
-    }
-
-    // rotation along the X-axis
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-        rotationVector.y -= rotationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-        rotationVector.y += rotationSpeed;
-    }
-
-    // rotation along the Y-axis
-    if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS) {
-        rotationVector.z -= rotationSpeed;
-    }
-    if (glfwGetKey(window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS) {
-        rotationVector.z += rotationSpeed;
-    }
-}
