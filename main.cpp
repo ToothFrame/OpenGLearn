@@ -12,11 +12,13 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+//timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 float rotationSpeed = 0.02f;
-const float cameraSpeed = 0.05f;
+
+//camera
 glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -64,11 +66,6 @@ int main() {
      //**************************************************************
 
      float vertices[] = {
-         //// positions          // colors           // texture coords (note that we changed them to 'zoom in' on our texture image)
-         // 0.5f,  0.5f, 0.0f,    1.0f, 1.0f, // top right
-         // 0.5f, -0.5f, 0.0f,    1.0f, 0.0f, // bottom right
-         //-0.5f, -0.5f, 0.0f,    0.0f, 0.0f, // bottom left
-         //-0.5f,  0.5f, 0.0f,    0.0f, 1.0f  // top left 
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -239,7 +236,10 @@ int main() {
 
     while (!glfwWindowShouldClose(window))
     {
-        double timeElapsed = glfwGetTime();
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         //input
         processInput(window);
 
@@ -268,7 +268,7 @@ int main() {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle + float(timeElapsed*10)), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, glm::radians(angle + static_cast<float>(glfwGetTime()*10)), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -277,7 +277,6 @@ int main() {
         // check events and swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
-       
     }
     glfwTerminate();
 	return 0;
@@ -293,6 +292,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    float cameraSpeed = static_cast<float>(2.5f * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
